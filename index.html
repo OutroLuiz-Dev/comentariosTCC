@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Projeto de Comentários</title>
   <style>
-    /* CSS Atualizado */
     body {
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
@@ -42,7 +41,7 @@
       margin-top: 10px;
     }
 
-    select, textarea, button {
+    input, select, textarea, button {
       width: 100%;
       padding: 10px;
       margin-top: 10px;
@@ -50,6 +49,10 @@
       border-radius: 5px;
       font-size: 1rem;
     }
+
+    #filter {
+  width: 400px; /* Para alinhamento correto com o resto do formulário */
+}
 
     textarea {
       background: rgba(255, 255, 255, 0.8);
@@ -169,7 +172,7 @@
   <br>
   <label for="filter">Filtrar por projeto:</label>
   <select id="filter">
-    <option value="">Todos</option>
+    <option value="">Escolha o grupo</option>
     <option value="Votação">Votação</option>
     <option value="Agenda">Agenda</option>
     <option value="Cardápio">Cardápio</option>
