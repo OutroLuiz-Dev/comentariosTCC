@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projeto de Comentários</title>
+  <style>
+    /* CSS Atualizado */
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    form {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      background: rgba(255, 255, 255, 0.8);
+      color: #333;
+    }
+
+    button {
+      background: #2575fc;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #6a11cb;
+    }
+
+    #comments {
+      margin-top: 20px;
+      width: 90%;
+      max-width: 600px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: left;
+    }
+
+    #comments div {
+      margin-bottom: 10px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getDatabase, ref, push, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvYT93c2tSFQ8iyvqprDpWVIMtHtuTgmA",
+      authDomain: "honorina-82a7c.firebaseapp.com",
+      databaseURL: "https://honorina-82a7c-default-rtdb.firebaseio.com",
+      projectId: "honorina-82a7c",
+      storageBucket: "honorina-82a7c.appspot.com",
+      messagingSenderId: "282741363642",
+      appId: "1:282741363642:web:ba5308ed05481279f60383"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.querySelector("#commentForm");
+      const projectInput = document.querySelector("#project");
+      const commentInput = document.querySelector("#comment");
+      const filterSelect = document.querySelector("#filter");
+      const commentsContainer = document.querySelector("#comments");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const project = projectInput.value;
+        const comment = commentInput.value.trim();
+
+        if (comment && project) {
+          push(ref(db, 'comments'), { project, comment });
+          commentInput.value = '';
+        }
+      });
+
+      filterSelect.addEventListener("change", () => {
+        const filter = filterSelect.value;
+        if (filter) {
+          const filteredCommentsRef = query(ref(db, 'comments'), orderByChild('project'), equalTo(filter));
+          loadComments(filteredCommentsRef);
+        } else {
+          loadComments(ref(db, 'comments'));
+        }
+      });
+
+      function loadComments(refToUse) {
+        onValue(refToUse, (snapshot) => {
+          commentsContainer.innerHTML = '';
+          snapshot.forEach((child) => {
+            const data = child.val();
+            const commentElement = document.createElement('div');
+            commentElement.innerHTML = `<strong>${data.project}</strong>: ${data.comment}`;
+            commentsContainer.appendChild(commentElement);
+          });
+        });
+      }
+
+      loadComments(ref(db, 'comments'));
+    });
+  </script>
+</head>
+<body>
+  <h1>Projetos e Comentários</h1>
+  <form id="commentForm">
+    <label for="project">Escolha o Projeto:</label>
+    <select id="project" required>
+      <option value="Votação">Votação</option>
+      <option value="Agenda">Agenda</option>
+      <option value="Cardápio">Cardápio</option>
+      <option value="Receita">Receita</option>
+      <option value="Adocly">Adocly</option>
+      <option value="Maquiagem">Maquiagem</option>
+    </select>
+    <br>
+    <label for="comment">Comentário (máximo 500 caracteres):</label>
+    <textarea id="comment" maxlength="500" required></textarea>
+    <br>
+    <button type="submit">Adicionar Comentário</button>
+  </form>
+  <br>
+  <label for="filter">Filtrar por projeto:</label>
+  <select id="filter">
+    <option value="">Todos</option>
+    <option value="Votação">Votação</option>
+    <option value="Agenda">Agenda</option>
+    <option value="Cardápio">Cardápio</option>
+    <option value="Receita">Receita</option>
+    <option value="Adocly">Adocly</option>
+    <option value="Maquiagem">Maquiagem</option>
+  </select>
+  <div id="comments"></div>
+</body>
+</html>
